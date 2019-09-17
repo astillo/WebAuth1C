@@ -2,9 +2,22 @@ const express = require('express')
 const server = express()
 const bcrypt = require('bcrypt')
 const restricted = require('./rest')
-
+const session = require('express-session')
 server.use(express.json())
 
+const sessionConfig = {
+    name: 'monkey',
+    secret: 'keep it secret, keep it safe',
+    cookie: {
+        maxAge: 1000 * 30,
+        secure: false, // this should be true in production
+        httpOnly: true,
+    },
+    resave: false,
+    saveUninitialized: false,
+};
+
+server.use(session(sessionConfig))
 
 const Users = require('./userModel')
 
@@ -26,6 +39,7 @@ server.post('/login', (req, res) => {
         .first()
         .then(user => {
             if (user && bcrypt.compareSync(password, user.password)) {
+                req.session.user = user
                 res.status(200).json({ message: `welcome ${username}` })
             } else {
                 res.status(401).json({ message: 'you are not authenticated' })
