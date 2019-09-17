@@ -2,6 +2,7 @@ const express = require('express')
 const server = express()
 const bcrypt = require('bcrypt')
 const restricted = require('./rest')
+const restricted1 = require('./restrickedMiddleWare')
 const session = require('express-session')
 server.use(express.json())
 
@@ -50,7 +51,7 @@ server.post('/login', (req, res) => {
         })
 })
 
-server.get('/users', restricted, (req, res) => {
+server.get('/users', restricted1, (req, res) => {
     Users.find()
         .then(users => {
             res.json(users)
